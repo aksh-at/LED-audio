@@ -9,7 +9,6 @@ acoustical feedback!
 """
 import sys
 import signal
-import time
 import os
 import jack
 from aubio import tempo, source
@@ -19,6 +18,9 @@ import socket
 
 HOST = '18.111.38.125'
 PORT = 6000
+
+rms_vals = []
+RMS_Q_SZ = 3
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
@@ -32,27 +34,28 @@ hop_s =  win_s/8          # hop size
 Sr    = client.samplerate
 o = tempo("default", win_s, hop_s, int(Sr))
 
-last_beat = None
 
 @client.set_process_callback
 def process(frames):
-    global last_beat
+    global rms_vals
     SIL_THRESH = 0.01
+
     assert frames == client.blocksize
     arr =  client.inports[0].get_array()
     rms = np.sum(np.square(arr))
-    if rms < SIL_THRESH:
+    if(rms < SIL_THRESH):
         return
-    N = len(arr)
+    rms_vals.append(rms)
+    if(len(rms_vals) == RMS_Q_SZ):
+        s.sendall(str(min(rms_vals)))
+        print min(rms_vals), len(rms_vals)
+        rms_vals = []
+
+    N   = len(arr)
     for i in xrange(1,int(N/hop_s)+1):
         if o(arr[(i-1)*hop_s:i*hop_s]):
-            millis = int(round(time.time() * 1000))
-            diff   = 0
-            if last_beat:
-                diff = millis - last_beat
-            last_beat = millis
             print "BEAT "
-            s.sendall("beat "+str(diff)+" "+str(rms))
+            s.sendall("beat "+str(rms)+" ")
 
 @client.set_shutdown_callback
 def shutdown(status, reason):
