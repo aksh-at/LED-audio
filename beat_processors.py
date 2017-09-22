@@ -4,7 +4,13 @@ from neopixel import Color
 
 def beat_proc_by_name(name, color_func):
     if name == 'sticky_white':
-        return StickyWhite(100, 250, 50, color_func)
+        return StickyWhite(200, 250, 75, color_func)
+    elif name == 'dummy':
+        return Dummy()
+
+class Dummy:
+    def process(self, strip, val, beat_freq):
+        pass
 
 class StickyWhite:
     """
@@ -26,9 +32,3 @@ class StickyWhite:
 
             print "BEAT! Sleeping for ", delay
             time.sleep(delay/1000.0)
-
-            for i in range(strip.numPixels()):
-                strip.setPixelColor(i, Color(0,0,0))
-            strip.show()
-
-            time.sleep(delay/2000.0)

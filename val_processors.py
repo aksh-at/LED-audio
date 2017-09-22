@@ -2,7 +2,22 @@ from neopixel import Color
 
 def val_proc_by_name(name, color_func):
     if name == 'histogram':
-        return Histogram(0.55, color_func)
+        return Histogram(0.7, color_func)
+    elif name == 'flat':
+        return Flat(color_func)
+
+class Flat:
+    """
+    Classic histogram-looking(?) visualizer
+    """
+    def __init__(self, color_func):
+        self.color_func = color_func
+
+    def process(self, strip, val, beat_freq):
+        for i in range(strip.numPixels()):
+                strip.setPixelColor(i, self.color_func.process(i, val, beat_freq))
+
+        strip.show()
         
 class Histogram:
     """
