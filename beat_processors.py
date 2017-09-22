@@ -4,7 +4,7 @@ from neopixel import Color
 
 def beat_proc_by_name(name, color_func):
     if name == 'sticky_white':
-        return StickyWhite(200, 250, 75, color_func)
+        return StickyWhite(300, 500, 75, color_func)
     elif name == 'dummy':
         return Dummy()
 

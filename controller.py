@@ -29,16 +29,14 @@ class StripController:
         self.NORMALIZE_SAMPLES = 1000
 
     def normalize(self, val):
-        return val
         if len(self.recent_vals) == self.NORMALIZE_SAMPLES:
             self.recent_vals = self.recent_vals[1:]
 
         self.recent_vals.append(val)
         self.floor_vol = 0.5*np.median(self.recent_vals)
         self.max_vol = 2.5*np.mean(self.recent_vals) - self.floor_vol
-        #print "max and floor are: ", self.max_vol, self.floor_vol
 
-        return (val - self.floor_vol)/self.max_vol
+        return max((val - self.floor_vol)/self.max_vol, 0.01)
 
 
     def run(self):
