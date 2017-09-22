@@ -34,7 +34,7 @@ conn, addr = s.accept()
 c = 0
 j = 0
 
-print 'Connected by', addr
+print('Connected by', addr)
 try:
     while 1:
         data = conn.recv(1024)
@@ -45,7 +45,7 @@ try:
             continue
         data = data.split()
         if data[0] == "beat":
-            print data
+            print(data)
             try:
                 delay = min(float(data[1]) * 200,500)
                 if delay <60:
@@ -59,7 +59,8 @@ try:
         else:
             try:
                 val = float(data[0])
-                lim = int(strip.numPixels()*val/2.0) + 20
+                lim = int(strip.numPixels()*val/20) + 30
+		print(lim)
                 for i in range(lim):
                         strip.setPixelColor(i, wheel((i+j) & 255))
                 for i in range(lim, strip.numPixels()):
