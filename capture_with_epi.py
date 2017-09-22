@@ -16,11 +16,8 @@ import threading
 import numpy as np
 import socket
 
-HOST = '18.111.38.125'
+HOST = '18.111.39.169'
 PORT = 6000
-
-rms_vals = []
-RMS_Q_SZ = 3
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
@@ -38,24 +35,21 @@ o = tempo("default", win_s, hop_s, int(Sr))
 @client.set_process_callback
 def process(frames):
     global rms_vals
-    SIL_THRESH = 0.01
+    SIL_THRESH = 0
 
     assert frames == client.blocksize
     arr =  client.inports[0].get_array()
-    rms = np.sum(np.square(arr))
-    if(rms < SIL_THRESH):
+    db = 20 * np.log10(np.sum(np.square(arr))) + 50
+    if(db < SIL_THRESH):
         return
-    rms_vals.append(rms)
-    if(len(rms_vals) == RMS_Q_SZ):
-        s.sendall(str(min(rms_vals)))
-        print min(rms_vals), len(rms_vals)
-        rms_vals = []
+    print(db)
+    s.sendall(str(db))
 
     N   = len(arr)
     for i in xrange(1,int(N/hop_s)+1):
         if o(arr[(i-1)*hop_s:i*hop_s]):
             print "BEAT "
-            s.sendall("beat "+str(rms)+" ")
+            s.sendall("beat "+str(db)+" ")
 
 @client.set_shutdown_callback
 def shutdown(status, reason):
