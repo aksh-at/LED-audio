@@ -46,12 +46,11 @@ def normalize(val):
     global recent_vals, max_vol
 
     if len(recent_vals) == NORMALIZE_SAMPLES:
-        #max_vol = sorted(recent_vals)[-NORMALIZE_SAMPLES/30]
-        max_vol = 2*np.mean(recent_vals)
-        recent_vals = []
-        print "Normalized max_volume to ", max_vol
-    else:
-        recent_vals.append(val)
+        recent_vals = recent_vals[1:]
+
+    recent_vals.append(val)
+    max_vol = 2*np.mean(recent_vals)
+    print "Normalized max_volume to ", max_vol
 
 def process_beat(data):
     global strip
