@@ -16,7 +16,7 @@ import threading
 import numpy as np
 import socket
 
-HOST = '18.111.39.169'
+HOST = '18.111.53.177'
 PORT = 6000
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,14 +35,13 @@ o = tempo("default", win_s, hop_s, int(Sr))
 @client.set_process_callback
 def process(frames):
     global rms_vals
-    SIL_THRESH = 0
+    SIL_THRESH = 0.001
 
     assert frames == client.blocksize
     arr =  client.inports[0].get_array()
     db = 20 * (np.sum(np.square(arr)))
     if(db < SIL_THRESH):
         return
-    print(db)
     s.sendall(str(db))
 
     N   = len(arr)

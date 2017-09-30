@@ -1,5 +1,7 @@
-from neopixel import Color
 import random
+
+def Color(red, green, blue, white = 0):
+    return (white << 24) | (red << 16)| (green << 8) | blue
 
 def color_func_by_name(name):
     if name == 'color_wheel':
